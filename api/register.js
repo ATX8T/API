@@ -2,19 +2,23 @@ import https from "https";
 
 export default async function handler(req, res) {
   const agent = new https.Agent({ rejectUnauthorized: false });
+
+  // 只允许 POST
+  if (req.method !== "POST") {
+    res.status(405).json({ error: "Method Not Allowed" });
+    return;
+  }
+
   try {
-    const proxyResp = await fetch("https://110.40.213.69/TestTheWebpage/API/RegisterAPI/Register.php", {
-      method: req.method,
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0"
-      },
-      body: req.method === "POST" ? JSON.stringify(req.body) : undefined,
-      agent
+    const resp = await fetch("https://110.40.213.69/TestTheWebpage/API/RegisterAPI/Register.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+      agent,
     });
-    const data = await proxyResp.text();
-    res.status(proxyResp.status).send(data);
-  } catch (error) {
-    res.status(500).json({ error: "Proxy error", detail: error.message });
+    const data = await resp.text();
+    res.status(resp.status).send(data);
+  } catch (e) {
+    res.status(500).json({ error: "Proxy error", detail: e.message });
   }
 }
