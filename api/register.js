@@ -1,14 +1,16 @@
 import https from "https";
 
 export default async function handler(req, res) {
-  const agent = new https.Agent({ rejectUnauthorized: false }); // 关闭证书校验
-
+  const agent = new https.Agent({ rejectUnauthorized: false });
   try {
     const proxyResp = await fetch("https://110.40.213.69/TestTheWebpage/API/RegisterAPI/Register.php", {
       method: req.method,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0"
+      },
       body: req.method === "POST" ? JSON.stringify(req.body) : undefined,
-      agent, // 重点是加上 agent
+      agent
     });
     const data = await proxyResp.text();
     res.status(proxyResp.status).send(data);
